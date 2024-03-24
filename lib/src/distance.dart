@@ -8,7 +8,7 @@ double dist2poly(Point p, Polyline poly) {
   var minD = double.infinity;
 
   for (int i = 1; i < poly.length; i++) {
-    var d = dist2segment2(p, poly[i - 1], poly[i]);
+    var d = dist2segment2(p, (poly[i - 1], poly[i]));
     if (d < minD) {
       minD = d;
     }
@@ -17,8 +17,11 @@ double dist2poly(Point p, Polyline poly) {
   return sqrt(minD);
 }
 
-/// Returns the squared minimum distance between p and the line segment (defined by v and w).
-double dist2segment2(Point p, Point v, Point w) {
+/// Returns the squared minimum distance between p and the line segment [s].
+double dist2segment2(Point p, Segment s) {
+  final v = s.$1;
+  final w = s.$2;
+
   // The length of the segment.
   final length = v.squaredDistanceTo(w);
   if (length == 0) {

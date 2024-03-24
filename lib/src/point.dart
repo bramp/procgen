@@ -13,6 +13,7 @@ extension PointExt on Point {
   @useResult
   Point clone() => Point(x, y);
 
+  // TODO Document
   @useResult
   Point normalise(double thickness) {
     if (x == 0 && y == 0) {

@@ -46,6 +46,7 @@ extension ChaikinSmoothExt on Polyline {
           smooth.add(p2);
         }
       } else {
+        // Add the first and last points unsmoothed.
         smooth.insert(0, points.first);
         smooth.add(points.last);
       }
@@ -67,6 +68,7 @@ extension ChaikinSmoothExt on Polyline {
       for (int i = 0; i < points.length; i++) {
         final v1 = points[i];
         if (i == 0 || i == points.length - 1) {
+          // Don't smooth first or last points.
           smooth.add(v1);
         } else {
           final v0 = points[i - 1];

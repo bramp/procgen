@@ -8,6 +8,9 @@ typedef Point = math.Point<double>;
 /// A line segment is defined by two points.
 typedef Segment = (Point, Point);
 
+/// A line which travels though these two points.
+typedef Line = (Point, Point);
+
 /// A polyline is a list of points.
 typedef Polyline = List<Point>;
 
@@ -18,4 +21,18 @@ typedef Polygon = Polyline;
 
 extension PolylineExt on Polyline {
   bool get closed => first == last;
+}
+
+/// Create a rectangler polygon that is width x height large, centered at 0,0.
+// TODO Move this onto a Polygon type.
+Polygon rect(double width, double height) {
+  final w2 = width / 2;
+  final h2 = height / 2;
+
+  return [
+    Point(-w2, -h2),
+    Point(w2, -h2),
+    Point(w2, h2),
+    Point(-w2, h2),
+  ];
 }

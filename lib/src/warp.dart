@@ -25,7 +25,7 @@ extension WrapExt on Polyline {
         var d = math.min(d1, d2);
         results.add(p +
             polar(d * c * ((rnd() + rnd() + rnd()) / 3 * 2 - 1),
-                math.pi * (rnd())));
+                math.pi * rnd()));
       }
     }
 
