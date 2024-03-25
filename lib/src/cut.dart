@@ -1,6 +1,7 @@
 import 'package:tile_generator/algo/intersect.dart';
 import 'package:tile_generator/algo/point.dart';
 import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/polygon.dart';
 
 // TODO Document what this does.
 List<Point> pierce(Polygon poly, Point p1, Point p2) {

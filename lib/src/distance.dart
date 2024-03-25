@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:tile_generator/algo/point.dart';
 import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/polyline.dart';
 
 /// Returns the minimum distance between p and the polyline.
 double dist2poly(Point p, Polyline poly) {

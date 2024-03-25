@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:math' as math;
 
@@ -27,19 +26,5 @@ extension PointExt on Point {
   @useResult
   Offset toOffset() {
     return Offset(x, y);
-  }
-}
-
-extension ListPointExt on Polyline {
-  // TODO DELETE
-  Float32List toFloat32List() {
-    final list = Float32List(length * 2);
-
-    int i = 0;
-    for (final p in this) {
-      list[i++] = p.x;
-      list[i++] = p.y;
-    }
-    return list;
   }
 }
