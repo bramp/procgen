@@ -9,12 +9,13 @@ Point lerpPoint<T>(Point a, Point b, [double t = 0.5]) {
 }
 
 extension PointExt on Point {
+  // TODO maybe delete?
   @useResult
   Point clone() => Point(x, y);
 
   // TODO Document
   @useResult
-  Point normalise(double thickness) {
+  Point normalise([double thickness = 1.0]) {
     if (x == 0 && y == 0) {
       return this;
     }

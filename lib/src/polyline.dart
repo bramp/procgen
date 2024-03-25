@@ -17,18 +17,10 @@ extension type Polyline(List<Point> points) implements Iterable<Point> {
   Polyline.empty({bool growable = false})
       : points = growable ? [] : List<Point>.empty(growable: true);
   Polyline.of(Iterable<Point> elements, {bool growable = true})
-      : points = List<Point>.of(elements, growable: growable);
-
-  /// Returns the number of points that make up this polygon.
-  int get length => points.length;
+      : points = List<Point>.of(elements, growable: growable),
+        assert(growable || elements.length >= 2);
 
   bool get closed => false;
-
-  Point operator [](int index) => points[index];
-  void operator []=(int index, Point value) => points[index] = value;
-
-  Point get first => points.first;
-  Point get last => points.last;
 
   /// Smooths the polyline using the Chaikin algorithm.
   Polyline chaikinSmooth({
@@ -87,4 +79,16 @@ extension type Polyline(List<Point> points) implements Iterable<Point> {
 
   void add(Point tail) => points.add(tail);
   void insert(int i, Point head) => points.insert(i, head);
+  void removeRange(int start, int end) => points.removeRange(start, end);
+
+  /// Returns the number of points that make up this polygon.
+  int get length => points.length;
+
+  Point operator [](int index) => points[index];
+  void operator []=(int index, Point value) => points[index] = value;
+
+  Point get first => points.first;
+  Point get last => points.last;
+
+  int indexOf(Point element, [int start = 0]) => points.indexOf(element, start);
 }
