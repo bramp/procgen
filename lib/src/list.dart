@@ -1,4 +1,6 @@
 // TODO Create a proper grid type.
+import 'dart:core';
+
 extension ListListExt on List<List<double>> {
   ({double min, double max}) get minMax {
     if (isEmpty) {
@@ -45,5 +47,16 @@ extension ListExt on List<double> {
     }
 
     return (min: min, max: max);
+  }
+}
+
+extension ListExt2<T> on List<T> {
+  /// Remove all the elements in [removed] from [this].
+  // TODO Find a more dart way of doing this.
+  List<T> removeAll(List<T> removed) {
+    for (int i = 0; i < removed.length; i++) {
+      remove(removed[i]);
+    }
+    return this;
   }
 }

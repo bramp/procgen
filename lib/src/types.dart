@@ -5,10 +5,10 @@ import 'dart:math' as math;
 /// A single point in 2D space.
 typedef Point = math.Point<double>;
 
-/// A line segment is defined by two points.
+/// A line segment that is bound by two points.
 typedef Segment = (Point, Point);
 
-/// A line which travels though these two points.
+/// A line which travels for infinite distance though these two points.
 typedef Line = (Point, Point);
 
 typedef Bounds = math.Rectangle<double>;

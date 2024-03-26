@@ -15,7 +15,7 @@ extension type Polygon(List<Point> points) {
       : points = List<Point>.of(elements, growable: growable),
         assert(elements.length >= 3);
 
-  /// Create a rectangler polygon that is [width] x [height], centered at 0,0.
+  /// Create a axis aligned rectangular polygon that is [width] x [height], centered at 0,0.
   Polygon.rect(double width, double height)
       : points = [
           Point(-width / 2, -height / 2),
@@ -64,5 +64,29 @@ extension type Polygon(List<Point> points) {
       list[i++] = p.y;
     }
     return list;
+  }
+
+  /// Returns true iff this polygon contain the point [p].
+  bool contains(Point p, {bool negative = false}) {
+    var inside = negative;
+    var p1 = last;
+    for (int i = 0; i < length; i++) {
+      final p0 = p1;
+      p1 = this[i];
+      var d1 = p1 - p0;
+      if (d1.y != 0) {
+        var t2 = (d1.y * (p.x - p0.x) - d1.x * (p.y - p0.y)) / d1.y;
+        if (t2 <= 0) {
+          final t1 = d1.x.abs() > d1.y.abs()
+              ? (p.x - p0.x - t2) / d1.x
+              : (p.y - p0.y) / d1.y;
+          if (t1 >= 0 && t1 <= 1) {
+            inside = !inside;
+          }
+        }
+      }
+    }
+
+    return inside;
   }
 }

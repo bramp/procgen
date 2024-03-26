@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:tile_generator/algo/polygon.dart';
 import 'package:tile_generator/algo/offset.dart' as o;
 import 'package:tile_generator/algo/types.dart';
 import 'package:tile_generator/algo/smooth.dart' as s;
@@ -77,8 +78,19 @@ extension type Polyline(List<Point> points) implements Iterable<Point> {
     return list;
   }
 
+  /// Closes this polyline and returns a polygon.
+  Polygon toPolygon() {
+    if (points.first == points.last) {
+      // If the polyline is already closed, remove the last point
+      return Polygon(points.sublist(0, points.length - 1));
+    }
+
+    return Polygon(points);
+  }
+
   void add(Point tail) => points.add(tail);
   void insert(int i, Point head) => points.insert(i, head);
+  Point removeLast() => points.removeLast();
   void removeRange(int start, int end) => points.removeRange(start, end);
 
   /// Returns the number of points that make up this polygon.

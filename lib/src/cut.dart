@@ -1,11 +1,12 @@
 import 'package:tile_generator/algo/intersect.dart';
-import 'package:tile_generator/algo/point.dart';
+import 'package:tile_generator/algo/line.dart';
 import 'package:tile_generator/algo/types.dart';
 import 'package:tile_generator/algo/polygon.dart';
 
-// TODO Document what this does.
-List<Point> pierce(Polygon poly, Point p1, Point p2) {
-  final dp1 = p2 - p1;
+/// Returns the points that the line [p1, p2] intersects the polygon [poly].
+// TODO Maybe rename intersectPolygon.
+List<Point> pierce(Polygon poly, Segment l) {
+  final dp1 = l.$1 - l.$2;
 
   final ratios = <double>[];
 
@@ -14,7 +15,7 @@ List<Point> pierce(Polygon poly, Point p1, Point p2) {
     final v1 = poly[(i + 1) % poly.length];
     final dp2 = v1 - v0;
 
-    final t = intersectLines((p1, dp1), (p2, dp2));
+    final t = intersectLines((l.$1, dp1), (v0, dp2));
     if (t != null && t.y >= 0 && t.y <= 1) {
       ratios.add(t.x);
     }
@@ -32,5 +33,5 @@ List<Point> pierce(Polygon poly, Point p1, Point p2) {
     }
   });
 
-  return ratios.map((t) => lerpPoint(p1, p2, t)).toList();
+  return ratios.map((t) => l.lerp(t)).toList();
 }
