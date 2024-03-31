@@ -4,7 +4,7 @@ import 'package:tile_generator/algo/types.dart';
 import 'package:tile_generator/algo/voronoi.dart';
 
 void main() {
-  test('voronoi', () {
+  test('Delaunay.voronoi()', () {
     final points = <Point>[
       const Point(62, 83),
       const Point(126, 224),
@@ -48,6 +48,7 @@ void main() {
   });
 }
 
+// ignore: unused_element
 String _drawSvg(Delaunay d, Map<Point, List<Point>> m) {
   final s = StringBuffer();
   s.write('<svg xmlns="http://www.w3.org/2000/svg">\n');
