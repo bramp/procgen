@@ -18,7 +18,6 @@ extension DelaunayExt on Delaunay {
 }
 
 void main() {
-
   test('VoronoiPattern.poisson()', () {
     final Random rng = Random(0);
     final pattern = VoronoiPattern.poisson(rng, 96, 96, 12);
@@ -27,7 +26,6 @@ void main() {
     expect(pattern.outer, isNotEmpty);
     expect(pattern.pattern, isNotEmpty);
   });
-
 
   test('VoronoiPattern().getRect()', () {
     final pattern = VoronoiPattern(seeds, testWidth, testHeight);
@@ -43,6 +41,7 @@ void main() {
   });
 }
 
+// ignore: unused_element
 String _drawSvg(List<List<Point>> polygons) {
   final s = StringBuffer();
   s.write('<svg xmlns="http://www.w3.org/2000/svg">\n');

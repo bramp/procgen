@@ -5,16 +5,16 @@ import 'package:delaunay/delaunay.dart';
 import 'package:tile_generator/algo/poisson_pattern.dart';
 import 'package:tile_generator/algo/voronoi.dart';
 
+import 'polygon.dart';
 import 'types.dart';
 
 class VoronoiPattern {
-  //var seeds, patW, patH;
   final int width;
   final int height;
 
   final List<Point> inner;
   final Map<Point, Point> outer;
-  final Map<Point, List<Point>> pattern;
+  final Map<Point, Polygon> pattern;
 
   VoronoiPattern._({
     required this.width,
@@ -76,7 +76,7 @@ class VoronoiPattern {
     final del = Delaunay(extended);
     del.update();
 
-    final pattern = <Point, List<Point>>{}; // this.pattern
+    final pattern = <Point, Polygon>{};
 
     // Only keep the polygons that are associated with the original seeds.
     // TODO There are more efficient ways to do this.
@@ -92,7 +92,7 @@ class VoronoiPattern {
     final inner = <Point>[];
     final outer = <Point, Point>{};
     for (final poly in pattern.values) {
-      for (final p in poly) {
+      for (final p in poly.points) {
         var x = p.x;
         var y = p.y;
 
@@ -167,7 +167,7 @@ class VoronoiPattern {
   }
 
   // TODO Change to accept a Rect
-  List<List<Point>> getRect(double x0, double y0, double w, double h) {
+  List<Polygon> getRect(double x0, double y0, double w, double h) {
     final x1 = x0 + w;
     final y1 = y0 + h;
 
@@ -193,12 +193,12 @@ class VoronoiPattern {
       vertices.add(row);
     }
 
-    final list = <List<Point>>[];
-    void addPoly(List<Point> poly, int x, int y) {
+    final list = <Polygon>[];
+    void addPoly(Polygon poly, int x, int y) {
       final v = vertices[y - top][x - left];
       final g = <Point>[];
 
-      for (final p in poly) {
+      for (final p in poly.points) {
         final index = inner.indexOf(p);
         if (index != -1) {
           g.add(v[index]);
@@ -218,28 +218,32 @@ class VoronoiPattern {
             final index1 = inner.indexOf(outer[p]!);
             g.add(v1[index1]);
           } else {
-            g.add(Point(p.x + x * width, p.y + y * height));
+            g.add(Point(
+              p.x + x * width,
+              p.y + y * height,
+            ));
           }
         }
       }
 
-      list.add(g);
+      list.add(Polygon(g));
     }
 
     for (int i = top; i < bottom; i++) {
       for (int j = left; j < right; j++) {
         for (final e in pattern.entries) {
-          var seed = e.key;
-          var poly = e.value;
+          final seed = e.key;
+          final poly = e.value;
 
-          var x = seed.x + j * width;
-          var y = seed.y + i * height;
+          final x = seed.x + j * width;
+          final y = seed.y + i * height;
           if (x > x0 && x < x1 && y > y0 && y < y1) {
             addPoly(poly, j, i);
           }
         }
       }
     }
+
     return list;
   }
 }

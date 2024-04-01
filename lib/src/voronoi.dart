@@ -1,9 +1,11 @@
 import 'package:delaunay/delaunay.dart';
 import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/polygon.dart';
 
 extension DelaunayExt on Delaunay {
-  Map<Point, List<Point>> voronoi() {
-    final results = <Point, List<Point>>{};
+  /// Returns centers and surrounding polygon for each voronoi cell.
+  Map<Point, Polygon> voronoi() {
+    final results = <Point, Polygon>{};
     final centers = List<Point?>.filled(triangles.length ~/ 3, null);
     final seen = List<bool>.filled(coords.length ~/ 2, false);
 
@@ -25,7 +27,7 @@ extension DelaunayExt on Delaunay {
         vertices.add(center);
       }
 
-      results[Point(coords[2 * p], coords[2 * p + 1])] = vertices;
+      results[Point(coords[2 * p], coords[2 * p + 1])] = Polygon(vertices);
     }
 
     return results;

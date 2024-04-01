@@ -6,6 +6,7 @@ import 'package:tile_generator/algo/smooth.dart' as s;
 
 /// Polygon is a closed area made up of three or more points. The first and last
 /// points are always connected.
+// TODO Consider renaming points to vertices.
 extension type Polygon(List<Point> points) {
   // TODO When https://github.com/dart-lang/language/issues/3343 is resolved
   // add default constructor with validation.
@@ -88,5 +89,15 @@ extension type Polygon(List<Point> points) {
     }
 
     return inside;
+  }
+
+  /// Returns the average of the points that make up this polygon.
+  Point center() {
+    var c = first;
+    for (int i = 1; i < length; i++) {
+      c += this[i];
+    }
+
+    return c * (1 / length);
   }
 }
