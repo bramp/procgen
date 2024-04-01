@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:tile_generator/algo/polygon.dart';
 import 'package:tile_generator/algo/types.dart';
 
@@ -9,14 +10,31 @@ class Vertex {
   final List<HalfEdge> edges = [];
 
   Vertex(this.point);
+
+  @override
+  String toString() => 'Vertex($point)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Vertex &&
+          point == other.point &&
+          const ListEquality().equals(edges, other.edges);
+
+  @override
+  int get hashCode => Object.hash(point, const ListEquality().hash(edges));
 }
 
 class HalfEdge {
   final Vertex origin;
 
+  /// The next edge in the face
   late final HalfEdge next;
+
+  /// The face this is part of.
   late final Face face;
 
+  /// A edge winding in the oppopsite direction, for a different face.
   HalfEdge? twin;
 
   HalfEdge._(this.origin);
@@ -26,6 +44,20 @@ class HalfEdge {
     origin.edges.add(e);
     return e;
   }
+
+  @override
+  String toString() => 'HalfEdge($origin, next: ${next.origin})';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HalfEdge &&
+          origin == other.origin &&
+          next == other.next &&
+          face == other.face;
+
+  @override
+  int get hashCode => Object.hash(origin, next, face);
 }
 
 class Face<D> {
@@ -48,6 +80,16 @@ class Face<D> {
 
     return face;
   }
+
+  @override
+  String toString() => 'Face(${halfEdge.origin}...)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Face && halfEdge == other.halfEdge;
+
+  @override
+  int get hashCode => halfEdge.hashCode;
 }
 
 /// Doubly connected edge list
