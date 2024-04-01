@@ -3,15 +3,38 @@ import 'dart:math';
 import 'package:tile_generator/algo/polar.dart';
 import 'package:tile_generator/algo/types.dart';
 
+/// Generates random tightly-packed points such that they maintain a
+/// minimum user-specified distance, by using the Poisson
+/// disk sampling algorithm.
+///
+/// Example:
+/// ```dart
+/// final pattern = PoissonPattern(
+///   rng: Random(),
+///   width: 500,
+///   height: 500,
+///   distance: 10,
+/// );
+///
+/// for (final point in pattern.points) {
+///   print(point);
+/// }
+/// ```
+///
+/// See:
+/// * https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm
+/// * https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
 class PoissonPattern {
   static const k = 50;
 
-  final List<Point?> grid;
   final points = <Point>[];
-  final queue = <Point>[]; // TODO maybe this should be a set
+
+  final List<Point?> _grid;
+  final _queue = <Point>[];
 
   final int width;
   final int height;
+
   final double distance;
   final double cellSize;
   final int gridWidth;
@@ -24,14 +47,24 @@ class PoissonPattern {
     required this.cellSize,
     required this.gridWidth,
     required this.gridHeight,
-  }) : grid = List.filled(gridWidth * gridHeight, null);
+  }) : _grid = List.filled(gridWidth * gridHeight, null);
 
   factory PoissonPattern({
     required Random rng,
+
+    /// The width of the pattern.
     required int width,
+
+    /// The height of the pattern.
     required int height,
+
+    /// The minimum distance between points.
     required double distance,
-    double u = 0.0, // TODO rename power
+
+    /// The unevenness of the pattern. A value of 0 will ensure all points are
+    /// atleast [distance] apart. A positive value will add some randomness to
+    /// each point, equal to [distance] * [unevenness] * random(0, 1).
+    double u = 0.0,
   }) {
     final cellSize = distance / sqrt(2);
 
@@ -44,60 +77,63 @@ class PoissonPattern {
       gridHeight: (height / cellSize).ceil(),
     );
 
-    p.emit(Point(width * rng.nextDouble(), height * rng.nextDouble()));
+    // Emit the first random point
+    p._emit(Point(width * rng.nextDouble(), height * rng.nextDouble()));
 
-    while (p.queue.isNotEmpty) {
-      p.step(rng);
+    while (p._queue.isNotEmpty) {
+      p._step(rng);
     }
 
     if (u > 0) {
-      p.uneven(rng, u);
+      p._uneven(rng, u);
     }
 
     return p;
   }
 
-  void emit(Point p) {
+  /// Emits the point, and adds it to the queue for processing.
+  void _emit(Point p) {
     points.add(p);
-    queue.add(p);
+    _queue.add(p);
 
-    grid[(p.y ~/ cellSize) * gridWidth + (p.x ~/ cellSize)] = p;
+    _grid[(p.y ~/ cellSize) * gridWidth + (p.x ~/ cellSize)] = p;
   }
 
-  void step(Random rng) {
-    assert(queue.isNotEmpty);
+  /// Step adding up to k more points from a random point in the queue.
+  void _step(Random rng) {
+    assert(_queue.isNotEmpty);
 
-    final p = queue[rng.nextInt(queue.length)];
+    /// Pick a random point from the queue
+    final p = _queue[rng.nextInt(_queue.length)];
     var emitted = false;
 
     // Try `k` times to find a valid point.
     for (int i = 0; i < k; i++) {
-      var q = polar(
+      // Generate a random point in the annulus of [1, 1.1] around `p`.
+      var q = p +
+          polar(
             distance * (1 + 0.1 * rng.nextDouble()),
             2 * pi * rng.nextDouble(),
-          ) +
-          p;
+          );
 
+      // Warp the point to ensure it stays inside the bounds.
       q = warp(q);
 
       if (validate(q)) {
         emitted = true;
-        emit(q);
+        _emit(q);
       }
     }
 
     if (!emitted) {
-      queue.remove(p);
+      _queue.remove(p);
     }
   }
 
+  /// If the point is outside the bounds of the pattern, warp it to the other side.
   Point warp(Point q) {
     double x = q.x;
     double y = q.y;
-
-    if (x == 0 && y == 0) {
-      return q;
-    }
 
     if (x < 0) {
       x += width;
@@ -113,20 +149,27 @@ class PoissonPattern {
     return Point(x, y);
   }
 
+  /// Returns true iff there are no points within `distance` of `p`.
   bool validate(final Point p) {
     final px = p.x ~/ cellSize;
     final py = p.y ~/ cellSize;
-    const n = 2;
+    const n = 1;
 
-    for (int y = py - n; y < py + n + 1; y++) {
-      final row = (y + gridHeight) % gridHeight * gridWidth;
-      for (int x = px - n; x < px + n + 1; x++) {
-        final g = grid[row + (x + gridWidth) % gridWidth];
+    // Range +/- [n] cells around p. This can wrap around to the other edge.
+    for (int y = py - n; y <= py + n; y++) {
+      // Calculate offset to row y
+      final row = (y % gridHeight) * gridWidth;
+      for (int x = px - n; x <= px + n; x++) {
+        final g = _grid[row + (x % gridWidth)];
         if (g != null) {
+          // Slightly more invovled distance calculation so that we can wrap
+          // around the edges.
           var dx = (g.x - p.x).abs();
           var dy = (g.y - p.y).abs();
-          dx = dx.clamp(0, width - dx);
-          dy = dy.clamp(0, height - dy);
+
+          // Use the min distance (either direct, or wrapped)
+          dx = min(dx, width - dx);
+          dy = min(dy, height - dy);
           if (dx * dx + dy * dy < (distance * distance)) {
             return false;
           }
@@ -136,18 +179,18 @@ class PoissonPattern {
     return true;
   }
 
-  void uneven(Random rng, double power) {
-    if (power == 0) {
+  void _uneven(Random rng, double power) {
+    if (power <= 0) {
       return;
     }
 
-    // TODO Turn this into map
-    for (int i = 0; i < points.length; i++) {
+    /// Replace all points with slightly adjusted points.
+    points.setAll(0, points.map((p) {
       final q = polar(
         distance * power * rng.nextDouble(),
         2 * pi * rng.nextDouble(),
       );
-      points[i] = warp(points[i] + q);
-    }
+      return warp(p + q);
+    }));
   }
 }
