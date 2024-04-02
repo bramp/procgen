@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 extension BoundsExt on Bounds {
   Bounds expandToInclude(Point other) {

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:tile_generator/algo/polygon.dart';
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/polygon.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 class Vertex {
   /// Position of this vertex.

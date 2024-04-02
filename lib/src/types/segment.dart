@@ -1,4 +1,4 @@
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 extension SegmentExt on Segment {
   /// Returns the point at the given [t] value along the line segment.

@@ -1,4 +1,4 @@
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 double testWidth = 96;
 double testHeight = 96;

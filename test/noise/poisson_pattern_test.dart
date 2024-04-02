@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tile_generator/algo/poisson_pattern.dart';
+import 'package:tile_generator/algo/noise/poisson_pattern.dart';
 
 void main() {
   const width = 250.0;

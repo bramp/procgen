@@ -1,5 +1,5 @@
-import 'package:tile_generator/algo/point.dart';
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/point.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 /// Smooths the list of points using the Chaikin algorithm.
 List<Point> chaikin({

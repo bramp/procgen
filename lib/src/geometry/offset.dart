@@ -1,5 +1,5 @@
-import 'package:tile_generator/algo/point.dart';
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/point.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 /// Offsets the open polyline by [distance].
 List<Point> offsetOpen(List<Point> points, {double distance = 1}) {

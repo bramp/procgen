@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 Point lerpPoint<T>(Point a, Point b, [double t = 0.5]) {
   return Point(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);

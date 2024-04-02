@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tile_generator/algo/distance.dart';
-import 'package:tile_generator/algo/types.dart';
-import 'package:tile_generator/algo/polyline.dart';
+import 'package:tile_generator/algo/types/distance.dart';
+import 'package:tile_generator/algo/types/types.dart';
+import 'package:tile_generator/algo/types/polyline.dart';
 
 void main() {
   test('dist2poly returns the minimum distance between a point and a polyline',

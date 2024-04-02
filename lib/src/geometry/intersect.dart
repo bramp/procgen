@@ -1,4 +1,4 @@
-import 'package:tile_generator/algo/types.dart';
+import 'package:tile_generator/algo/types/types.dart';
 
 /// Returns the intersection point of two lines.
 // TODO What happens when colinear.
