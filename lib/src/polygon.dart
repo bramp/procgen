@@ -25,6 +25,18 @@ extension type Polygon(List<Point> points) {
           Point(-width / 2, height / 2),
         ];
 
+  static bool isValid(List<Point> points) {
+    if (points.length < 3) {
+      throw ArgumentError('Polygon must have at least 3 points');
+    }
+    if (points.toSet().length != points.length) {
+      throw ArgumentError('Duplicate points in polygon');
+    }
+    // TODO Check for self-intersecting polygons.
+
+    return true;
+  }
+
   /// Returns the number of points that make up this polygon.
   int get length => points.length;
 
@@ -53,7 +65,7 @@ extension type Polygon(List<Point> points) {
   }
 
   Polygon offset([double distance = 1]) {
-    return Polygon(o.offsetClosed(points: points, distance: distance));
+    return Polygon(o.offsetClosed(points, distance: distance));
   }
 
   Float32List toFloat32List() {
@@ -68,7 +80,7 @@ extension type Polygon(List<Point> points) {
   }
 
   /// Returns true iff this polygon contain the point [p].
-  bool contains(Point p, {bool negative = false}) {
+  bool containsPoint(final Point p, {bool negative = false}) {
     var inside = negative;
     var p1 = last;
     for (int i = 0; i < length; i++) {

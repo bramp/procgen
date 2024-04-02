@@ -4,34 +4,83 @@ import 'dart:typed_data';
 import 'package:delaunay/delaunay.dart';
 import 'package:tile_generator/algo/poisson_pattern.dart';
 import 'package:tile_generator/algo/voronoi.dart';
+import 'package:collection/collection.dart';
 
 import 'polygon.dart';
 import 'types.dart';
 
+/// Create a Voronoi pattern from a set of seeds.
+///
+/// Example:
+/// ```dart
+/// List<Point> points = [...];
+/// final voronoi = VoronoiPattern(points, 500, 500);
+///
+/// for (final e in voronoi.pattern.entries) {
+///   final seed = e.key;
+///   final polygon = e.value;
+///   ...
+/// }
+/// ```
+///
+/// or generate one from random poisson distributed points:
+///
+/// ```dart
+/// final voronoi = VoronoiPattern.poisson(Random(), 500, 500, 25);
+/// ```
+///
 class VoronoiPattern {
-  final int width;
-  final int height;
+  final double width;
+  final double height;
 
-  final List<Point> inner;
-  final Map<Point, Point> outer;
   final Map<Point, Polygon> pattern;
+
+  /// All the points of the polygons that fall inside of (0,0)-(width,height).
+  final List<Point> _inner;
+
+  /// All the points of the polygons that fall outside of (0,0)-(width,height),
+  /// mapped to the equalivant point in the inner list.
+  final Map<Point, Point> _outer;
 
   VoronoiPattern._({
     required this.width,
     required this.height,
-    required this.inner,
-    required this.outer,
     required this.pattern,
-  });
+    required List<Point> inner,
+    required Map<Point, Point> outer,
+  })  : _inner = inner,
+        _outer = outer;
 
+  /// Generate a Voronoi pattern using a list of seeds.
   factory VoronoiPattern(
-    final List<Point> seeds,
-    final int width,
-    final int height,
+    final List<Point> seeds, // TODO Consider changing to a set.
+    final double
+        width, // TODO Consider not requiring width/height, and infer it from seeds.
+    final double height,
   ) {
     final int n = seeds.length;
     final Set<Point> seeds32 = {};
     final Float32List extended = Float32List(n * 2 * 9);
+
+    // Mirror all the seeds around the edges of the (0,0)-(width,height) rect.
+    //
+    // So we have 9 quadrants:
+    // +---------+---------+---------+
+    // |         |         |         |
+    // | Quadrant| Quadrant| Quadrant|
+    // |    1    |    2    |    3    |
+    // |         |         |         |
+    // +---------+---------+---------+
+    // |         |         |         |
+    // | Quadrant| Original| Quadrant|
+    // |    4    |  Seeds  |    5    |
+    // |         |         |         |
+    // +---------+---------+---------+
+    // |         |         |         |
+    // | Quadrant| Quadrant| Quadrant|
+    // |    6    |    7    |    8    |
+    // |         |         |         |
+    // +---------+---------+---------+
 
     int j = 0;
     for (int i = 0; i < n; i++) {
@@ -43,15 +92,19 @@ class VoronoiPattern {
       // Convert seeds to 32bit floats that are needed by Delaunay.
       // (this simplifies comparisions later).
       // TODO Convert Delaunay to support 64 bit floats.
+      //      https://github.com/zanderso/delaunay.dart/issues/16
       seeds32.add(Point(extended[j - 2], extended[j - 1]));
 
       // Store all the other seeds in this array
+      // Quadrant 1
       extended[j++] = p.x - width;
       extended[j++] = p.y - height;
 
+      // Quadrant 2
       extended[j++] = p.x;
       extended[j++] = p.y - height;
 
+      // Quadrant 3, etc
       extended[j++] = p.x + width;
       extended[j++] = p.y - height;
 
@@ -71,7 +124,7 @@ class VoronoiPattern {
       extended[j++] = p.y + height;
     }
 
-    assert(j == extended.length);
+    assert(j == extended.length, "Did not fill the extended array");
 
     final del = Delaunay(extended);
     del.update();
@@ -89,6 +142,10 @@ class VoronoiPattern {
       }
     }
 
+    assert(pattern.length == seeds.length,
+        "Not all seeds were used, or there were duplicate seeds");
+
+    // Sort the points into inner and outer points.
     final inner = <Point>[];
     final outer = <Point, Point>{};
     for (final poly in pattern.values) {
@@ -97,8 +154,11 @@ class VoronoiPattern {
         var y = p.y;
 
         if (x >= 0 && x < width && y >= 0 && y < height) {
+          // Inside the pattern. Add to inner.
           inner.add(p);
         } else if (!outer.containsKey(p)) {
+          // Outside the pattern, so calculate the point that would represent
+          // this point inside the pattern.
           if (x < 0) {
             x += width;
           }
@@ -111,6 +171,7 @@ class VoronoiPattern {
           if (y >= height) {
             y -= height;
           }
+          // Outside point, mapped to the appropriate inner point.
           outer[p] = Point(x, y);
         }
       }
@@ -118,28 +179,10 @@ class VoronoiPattern {
 
     assert(outer.isEmpty || inner.isNotEmpty);
 
-    for (final e in outer.entries) {
-      final op = e.key;
-      final warped = e.value;
-
-      late Point nearestInnerPoint;
-      var minD = double.infinity;
-
-      for (final p in inner) {
-        final d = warped.squaredDistanceTo(p);
-
-        if (d < minD) {
-          nearestInnerPoint = p;
-          if (d < 1e-10) {
-            // Bail early if we are very close
-            break;
-          }
-          minD = d;
-        }
-      }
-
-      outer[op] = nearestInnerPoint;
-    }
+    // Update every value in outer, to actually point to valid point in inner.
+    outer.updateAll((key, warped) =>
+        // Find the nearest point to [warped] in [inner].
+        minBy(inner, (p) => warped.squaredDistanceTo(p))!);
 
     return VoronoiPattern._(
       width: width,
@@ -150,23 +193,34 @@ class VoronoiPattern {
     );
   }
 
+  /// Generate a Voronoi pattern using a [PoissonPattern] as seeds.
   factory VoronoiPattern.poisson(
     Random rng,
-    int width,
-    int height,
+    double width,
+    double height,
     double distance,
   ) {
     final seeds = PoissonPattern(
       rng: rng,
-      width: width,
-      height: height,
+      width: width.toDouble(),
+      height: height.toDouble(),
       distance: distance,
     ).points;
 
     return VoronoiPattern(seeds, width, height);
   }
 
-  // TODO Change to accept a Rect
+  /// Returns a repeated tiling of the voronoi diagram covering a area [w] by [h]
+  /// starting at [x0], [y0].
+  ///
+  /// For example:
+  /// ```dart
+  /// // Generate a pattern 100 x 100
+  /// final voronoi = VoronoiPattern.poisson(Random(), 100, 100, 25);
+  ///
+  /// // Return a tiled version 200x200 starting at -50, -50
+  /// final polys = voronoi.getRect(-50, -50, 150, 150);
+  /// ```
   List<Polygon> getRect(double x0, double y0, double w, double h) {
     final x1 = x0 + w;
     final y1 = y0 + h;
@@ -176,15 +230,16 @@ class VoronoiPattern {
     final left = (x0 / width).floor();
     final right = (x1 / width).ceil();
 
+    // Create multiple copies of the pattern, to cover the entire area.
     final vertices = <List<List<Point>>>[];
     for (int y = top; y < bottom; y++) {
       final row = <List<Point>>[];
       for (int x = left; x < right; x++) {
         final dx = x * width;
         final dy = y * height;
-        var points = <Point>[]; // TODO Polyline?
+        var points = <Point>[];
 
-        for (final p in inner) {
+        for (final p in _inner) {
           points.add(Point(p.x + dx, p.y + dy));
         }
 
@@ -199,7 +254,7 @@ class VoronoiPattern {
       final g = <Point>[];
 
       for (final p in poly.points) {
-        final index = inner.indexOf(p);
+        final index = _inner.indexOf(p);
         if (index != -1) {
           g.add(v[index]);
         } else {
@@ -215,7 +270,7 @@ class VoronoiPattern {
                   : x;
           if (ii >= top && ii < bottom && jj >= left && jj < right) {
             final v1 = vertices[ii - top][jj - left];
-            final index1 = inner.indexOf(outer[p]!);
+            final index1 = _inner.indexOf(_outer[p]!);
             g.add(v1[index1]);
           } else {
             g.add(Point(
@@ -224,6 +279,16 @@ class VoronoiPattern {
             ));
           }
         }
+        if (g.length >= 2 && g[g.length - 1] == g[g.length - 2]) {
+          // Sometimes the same point gets added twice in a row.
+          // This seems like a bug in the algorithm.
+          g.removeLast();
+        }
+      }
+
+      // Ensure this polygon is not explictly closed
+      if (g.first == g.last) {
+        g.removeLast();
       }
 
       list.add(Polygon(g));
@@ -237,7 +302,7 @@ class VoronoiPattern {
 
           final x = seed.x + j * width;
           final y = seed.y + i * height;
-          if (x > x0 && x < x1 && y > y0 && y < y1) {
+          if (x >= x0 && x < x1 && y >= y0 && y < y1) {
             addPoly(poly, j, i);
           }
         }

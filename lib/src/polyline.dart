@@ -60,7 +60,7 @@ extension type Polyline(List<Point> points) implements Iterable<Point> {
   }
 
   Polyline offset([double distance = 1]) {
-    return Polyline(o.offsetOpen(points: points, distance: distance));
+    return Polyline(o.offsetOpen(points, distance: distance));
   }
 
   Polyline resample({required double step}) {

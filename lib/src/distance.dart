@@ -5,11 +5,12 @@ import 'package:tile_generator/algo/types.dart';
 import 'package:tile_generator/algo/polyline.dart';
 
 /// Returns the minimum distance between p and the polyline.
-double dist2poly(Point p, Polyline poly) {
+// TODO Move onto Point/Polyline class
+double distanceToPolyline(Point p, Polyline poly) {
   var minD = double.infinity;
 
   for (int i = 1; i < poly.length; i++) {
-    var d = dist2segment2(p, (poly[i - 1], poly[i]));
+    var d = squaredDistanceToSegment(p, (poly[i - 1], poly[i]));
     if (d < minD) {
       minD = d;
     }
@@ -19,7 +20,8 @@ double dist2poly(Point p, Polyline poly) {
 }
 
 /// Returns the squared minimum distance between p and the line segment [s].
-double dist2segment2(Point p, Segment s) {
+// TODO Move onto Point/Segment class
+double squaredDistanceToSegment(Point p, Segment s) {
   final v = s.$1;
   final w = s.$2;
 

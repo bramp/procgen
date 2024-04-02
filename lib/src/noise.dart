@@ -62,9 +62,8 @@ class Perlin {
     double amplitude = 1.0,
   }) {
     // TODO Maybe just generate the permutation on the fly.
-
     final s = rng.nextInt(permutation.length);
-    // TODO This could be converting to the ... syntax.
+
     var p = <int>[];
     for (int i = 0; i < 256; i++) {
       p.add(permutation[(i + s) % permutation.length]);
@@ -73,7 +72,11 @@ class Perlin {
     // Double the length of p to avoid overview
     p = [...p, ...p];
 
-    return Perlin._(p: p, gridSize: gridSize, amplitude: amplitude);
+    return Perlin._(
+      p: p,
+      gridSize: gridSize,
+      amplitude: amplitude,
+    );
   }
 
   double get(double x, double y) {

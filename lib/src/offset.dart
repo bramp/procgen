@@ -2,7 +2,7 @@ import 'package:tile_generator/algo/point.dart';
 import 'package:tile_generator/algo/types.dart';
 
 /// Offsets the open polyline by [distance].
-List<Point> offsetOpen({required List<Point> points, double distance = 1}) {
+List<Point> offsetOpen(List<Point> points, {double distance = 1}) {
   final results = <Point>[];
   for (int i = 0; i < points.length; i++) {
     final p = points[i];
@@ -25,7 +25,7 @@ List<Point> offsetOpen({required List<Point> points, double distance = 1}) {
 }
 
 /// Offsets the closed polygon by [distance].
-List<Point> offsetClosed({required List<Point> points, double distance = 1}) {
+List<Point> offsetClosed(List<Point> points, {double distance = 1}) {
   final results = <Point>[];
   for (int i = 0; i < points.length; i++) {
     final p = points[i];

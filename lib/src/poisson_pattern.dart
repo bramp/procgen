@@ -32,8 +32,8 @@ class PoissonPattern {
   final List<Point?> _grid;
   final _queue = <Point>[];
 
-  final int width;
-  final int height;
+  final double width;
+  final double height;
 
   final double distance;
   final double cellSize;
@@ -53,10 +53,10 @@ class PoissonPattern {
     required Random rng,
 
     /// The width of the pattern.
-    required int width,
+    required double width,
 
     /// The height of the pattern.
-    required int height,
+    required double height,
 
     /// The minimum distance between points.
     required double distance,
@@ -64,7 +64,9 @@ class PoissonPattern {
     /// The unevenness of the pattern. A value of 0 will ensure all points are
     /// atleast [distance] apart. A positive value will add some randomness to
     /// each point, equal to [distance] * [unevenness] * random(0, 1).
-    double u = 0.0,
+    // TODO Consider if we wish to keep this, or just add a new function that
+    // generically warps all points.
+    double unevenness = 0.0,
   }) {
     final cellSize = distance / sqrt(2);
 
@@ -84,8 +86,8 @@ class PoissonPattern {
       p._step(rng);
     }
 
-    if (u > 0) {
-      p._uneven(rng, u);
+    if (unevenness > 0) {
+      p._uneven(rng, unevenness);
     }
 
     return p;
@@ -109,9 +111,11 @@ class PoissonPattern {
 
     // Try `k` times to find a valid point.
     for (int i = 0; i < k; i++) {
-      // Generate a random point in the annulus of [1, 1.1] around `p`.
+      // Generate a random point in the annulus of [1r, 1.1r) around `p`.
       var q = p +
           polar(
+            // The original paper asks for a random number between r and 2r.
+            // However, for more tighly packed points, we use a r and 1.1r.
             distance * (1 + 0.1 * rng.nextDouble()),
             2 * pi * rng.nextDouble(),
           );
@@ -153,7 +157,7 @@ class PoissonPattern {
   bool validate(final Point p) {
     final px = p.x ~/ cellSize;
     final py = p.y ~/ cellSize;
-    const n = 1;
+    const n = 2;
 
     // Range +/- [n] cells around p. This can wrap around to the other edge.
     for (int y = py - n; y <= py + n; y++) {

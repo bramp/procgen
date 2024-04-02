@@ -1,16 +1,18 @@
 import 'package:tile_generator/algo/point.dart';
 import 'package:tile_generator/algo/types.dart';
 
+/// Smooths the list of points using the Chaikin algorithm.
 List<Point> chaikin({
   required List<Point> points,
 
-  /// Do the points a closed loop?
+  /// Should the last point be connected with the first.
   bool closed = false,
 
   /// Number of iterations to smooth
   int iterations = 1,
 
-  /// Exclude points from being smoothed.
+  /// Exclude points from being smoothed. Useful for anchor points that should
+  /// not be moved.
   Set<Point> exclude = const <Point>{},
 }) {
   assert(iterations >= 1);

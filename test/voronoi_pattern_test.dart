@@ -22,16 +22,12 @@ void main() {
     final Random rng = Random(0);
     final pattern = VoronoiPattern.poisson(rng, 96, 96, 12);
 
-    expect(pattern.inner, isNotEmpty);
-    expect(pattern.outer, isNotEmpty);
     expect(pattern.pattern, isNotEmpty);
   });
 
   test('VoronoiPattern().getRect()', () {
     final pattern = VoronoiPattern(seeds, testWidth, testHeight);
 
-    expect(pattern.inner, isNotEmpty);
-    expect(pattern.outer, isNotEmpty);
     expect(pattern.pattern, isNotEmpty);
 
     final voronoi = pattern.getRect(-298, -298, 596, 596);
@@ -39,6 +35,48 @@ void main() {
 
     // print(_drawSvg(voronoi));
   });
+
+  for (int i = 0; i < 1000; i++) {
+    test('VoronoiPattern(Random($i)) invalid polygons', () {
+      final rng = Random(i);
+      final voronoi = VoronoiPattern.poisson(rng, 96, 96, 12);
+
+      expect(voronoi.pattern, isNotEmpty);
+
+      // Check for invalid polygons
+      for (final e in voronoi.pattern.entries) {
+        final seed = e.key;
+        final poly = e.value;
+
+        expect(poly.length, greaterThan(2));
+        expect(poly.points.toSet().length, equals(poly.length),
+            reason: "Duplicate points in polygon: $poly");
+        expect(poly.containsPoint(seed), isTrue);
+      }
+
+      // print(_drawSvg(voronoi));
+    });
+  }
+
+  for (int i = 0; i < 1000; i++) {
+    test('VoronoiPattern(Random($i)).getRect() invalid polygons', () {
+      final rng = Random(i);
+      final voronoi = VoronoiPattern.poisson(rng, 96, 96, 12);
+
+      expect(voronoi.pattern, isNotEmpty);
+
+      final polygons = voronoi.getRect(-298, -298, 596, 596);
+
+      // Check for invalid polygons
+      for (final poly in polygons) {
+        expect(poly.length, greaterThan(2));
+        expect(poly.points.toSet().length, equals(poly.length),
+            reason: "Duplicate points in polygon: $poly");
+      }
+
+      // print(_drawSvg(voronoi));
+    });
+  }
 }
 
 // ignore: unused_element

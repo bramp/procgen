@@ -23,7 +23,7 @@ void main() {
     ];
 
     for (final t in tests) {
-      final actual = dist2poly(t.$1, polyline);
+      final actual = distanceToPolyline(t.$1, polyline);
       expect(actual, equals(t.$2),
           reason: 'dist2poly(${t.$1}) = $actual expected ${t.$2}');
     }

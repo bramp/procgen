@@ -1,7 +1,7 @@
 import 'package:tile_generator/algo/types.dart';
 
-const testWidth = 96;
-const testHeight = 96;
+double testWidth = 96;
+double testHeight = 96;
 const seeds = [
   Point(15.397896997350221, 39.88595909247452),
   Point(17.99080875173698, 27.791624180973848),
