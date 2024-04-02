@@ -3,7 +3,7 @@ import 'package:tile_generator/algo/types/segment.dart';
 import 'package:tile_generator/algo/types/types.dart';
 import 'package:tile_generator/algo/types/polygon.dart';
 
-/// Returns the points that the line [p1, p2] intersects the polygon [poly].
+/// Returns the points that segment [l] intersects the polygon [poly].
 // TODO Maybe rename intersectPolygon.
 List<Point> pierce(Polygon poly, Segment l) {
   final dp1 = l.$1 - l.$2;

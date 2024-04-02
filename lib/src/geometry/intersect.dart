@@ -1,7 +1,8 @@
 import 'package:tile_generator/algo/types/types.dart';
 
 /// Returns the intersection point of two lines.
-// TODO What happens when colinear.
+/// If the lines do not intersect, or are colinear then null is returned.
+// TODO Move this onto the Line type.
 Point? intersectLines(Line a, Line b) {
   // Start (0) and end (1) points of lines a and b.
   final (a0, a1) = a;
@@ -23,15 +24,59 @@ Point? intersectLines(Line a, Line b) {
   return Point(t1, t2);
 }
 
-/// Do two line segments intersect?
-bool intersectSegments(Segment a, Segment b) {
-  // Test if two lines (colinear with a/b would intersect)
-  final t = intersectLines(a, b);
-  if (t != null && t.x >= 0 && t.x <= 1 && t.y >= 0) {
-    return t.y <= 1;
-  } else {
-    // If they wouldn't interesect, or the interspection is not within the
-    // bounds of a/b.
-    return false;
+enum Orientation {
+  collinear,
+  clockwise,
+  counterclockwise,
+}
+
+/// Returns the orientation of the triplet (p, q, r).
+Orientation orientation(Point p, Point q, Point r) {
+  // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
+  // for details of below formula.
+  final val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+
+  if (val == 0) return Orientation.collinear; // collinear
+
+  return (val > 0)
+      ? Orientation.clockwise
+      : Orientation.counterclockwise; // clock or counterclock wise
+}
+
+/// Returns the intersection of two line segments. or null if they don't
+/// intersect, or are colinear.
+// TODO Move this onto the Segment type.
+Point? intersectSegments(Segment a, Segment b) {
+  // Using algorithm from
+  // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+
+  final o1 = orientation(a.$1, a.$2, b.$1);
+  final o2 = orientation(a.$1, a.$2, b.$2);
+  final o3 = orientation(b.$1, b.$2, a.$1);
+  final o4 = orientation(b.$1, b.$2, a.$2);
+
+  // General case
+  if (o1 != o2 && o3 != o4) {
+    return intersectLines(a, b);
   }
+
+  // They may be collinear and interspect, but we return null in that case.
+  return null;
+
+/*
+  // Special Cases
+  // a.$1, a.$2 and b.$1 are collinear and b.$1 lies on segment [a].
+  if (o1 == Orientation.collinear && a.containsPoint(b.$1)) return true;
+
+  // a.$1, a.$2 and b.$2 are collinear and b.$2 lies on segment [a].
+  if (o2 == Orientation.collinear && a.containsPoint(b.$2)) return true;
+
+  // b.$1, b.$2 and a.$1 are collinear and a.$1 lies on segment [b]
+  if (o3 == Orientation.collinear && b.containsPoint(a.$1)) return true;
+
+  // b.$1, b.$2 and a.$2 are collinear and a.$2 lies on segment [b]
+  if (o4 == Orientation.collinear && b.containsPoint(a.$2)) return true;
+
+  return false; // Doesn't fall in any of the above cases
+*/
 }
