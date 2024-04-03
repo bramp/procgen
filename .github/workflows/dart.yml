@@ -15,10 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
 
-      - name: Run tests (unit)
-        run: dart test
+      - name: Install melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap melos
+        run: melos bootstrap
+
+      - name: Run tests
+        run: melos test
 
   format:
     name: Checks the code is formatted.
