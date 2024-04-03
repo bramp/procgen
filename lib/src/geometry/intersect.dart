@@ -60,7 +60,7 @@ Point? intersectSegments(Segment a, Segment b) {
     return intersectLines(a, b);
   }
 
-  // They may be collinear and interspect, but we return null in that case.
+  // They may be collinear and intersect, but we return null in that case.
   return null;
 
 /*
