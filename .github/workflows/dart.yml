@@ -37,6 +37,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
 
+      - name: Install melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap melos
+        run: melos bootstrap
+
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
 
