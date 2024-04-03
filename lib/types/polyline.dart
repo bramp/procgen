@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:tile_generator/algo/types/polygon.dart';
-import 'package:tile_generator/algo/geometry/offset.dart' as o;
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/geometry/smooth.dart' as s;
-import 'package:tile_generator/algo/noise/warp.dart' as w;
-import 'package:tile_generator/algo/geometry/resample.dart' as r;
+import 'package:procgen/types/polygon.dart';
+import 'package:procgen/geometry/offset.dart' as o;
+import 'package:procgen/types/types.dart';
+import 'package:procgen/geometry/smooth.dart' as s;
+import 'package:procgen/noise/warp.dart' as w;
+import 'package:procgen/geometry/resample.dart' as r;
 
 /// Polyline is a continuous line that is composed of one or more connected
 /// straight line segments.

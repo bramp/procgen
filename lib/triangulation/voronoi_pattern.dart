@@ -2,12 +2,12 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:delaunay/delaunay.dart';
-import 'package:tile_generator/algo/noise/poisson_pattern.dart';
-import 'package:tile_generator/algo/triangulation/voronoi.dart';
 import 'package:collection/collection.dart';
+import 'package:procgen/noise/poisson_pattern.dart';
+import 'package:procgen/triangulation/voronoi.dart';
 
-import '../types/polygon.dart';
-import '../types/types.dart';
+import 'package:procgen/types/polygon.dart';
+import 'package:procgen/types/types.dart';
 
 /// Create a Voronoi pattern from a set of seeds.
 ///

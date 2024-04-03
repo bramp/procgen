@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:tile_generator/algo/types/types.dart';
+import '../procgen.dart';
 
 extension SegmentExt on Segment {
   /// Returns the point at the given [t] value along the line segment.

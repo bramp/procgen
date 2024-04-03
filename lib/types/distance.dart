@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:tile_generator/algo/types/point.dart';
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/types/polyline.dart';
+import 'package:procgen/types/point.dart';
+import 'package:procgen/types/types.dart';
+import 'package:procgen/types/polyline.dart';
 
 /// Returns the minimum distance between p and the polyline.
 // TODO Move onto Point/Polyline class

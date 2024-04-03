@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:tile_generator/algo/geometry/intersect.dart';
-import 'package:tile_generator/algo/types/types.dart';
+import 'package:procgen/procgen.dart';
+import 'package:test/test.dart';
 
 void main() {
   test(

@@ -1,4 +1,4 @@
-import 'package:tile_generator/algo/types/types.dart';
+import 'package:procgen/procgen.dart';
 
 double testWidth = 96;
 double testHeight = 96;

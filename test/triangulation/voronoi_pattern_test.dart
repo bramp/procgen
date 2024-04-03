@@ -1,9 +1,8 @@
 import 'dart:math';
 
 import 'package:delaunay/delaunay.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/triangulation/voronoi_pattern.dart';
+import 'package:procgen/procgen.dart';
+import 'package:test/test.dart';
 
 import 'voronoi_pattern_test_data.dart';
 

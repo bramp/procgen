@@ -1,4 +1,4 @@
-import 'package:tile_generator/algo/types/types.dart';
+import 'package:procgen/types/types.dart';
 
 /// Returns the intersection point of two lines.
 /// If the lines do not intersect, or are colinear then null is returned.

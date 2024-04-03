@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:tile_generator/algo/noise/perlin.dart';
+import 'perlin.dart';
 
 class Noise {
   final List<Perlin> components;

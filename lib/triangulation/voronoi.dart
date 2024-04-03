@@ -1,6 +1,6 @@
 import 'package:delaunay/delaunay.dart';
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/types/polygon.dart';
+
+import '../procgen.dart';
 
 extension DelaunayExt on Delaunay {
   /// Returns centers and surrounding polygon for each voronoi cell.

@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:tile_generator/algo/geometry/offset.dart' as o;
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/geometry/smooth.dart' as s;
+import 'package:procgen/types/types.dart';
+
+import 'package:procgen/geometry/offset.dart' as o;
+import 'package:procgen/geometry/smooth.dart' as s;
 
 /// Polygon is a closed area made up of three or more points. The first and last
 /// points are always connected.

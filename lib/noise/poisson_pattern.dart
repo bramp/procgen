@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:tile_generator/algo/types/polar.dart';
-import 'package:tile_generator/algo/types/types.dart';
+import 'package:procgen/types/polar.dart';
+import 'package:procgen/types/types.dart';
 
 /// Generates random tightly-packed points such that they maintain a
 /// minimum user-specified distance, by using the Poisson

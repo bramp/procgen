@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:tile_generator/algo/types/polar.dart';
-import 'package:tile_generator/algo/random.dart';
-import 'package:tile_generator/algo/types/types.dart';
+import 'package:procgen/random.dart';
+import 'package:procgen/types/polar.dart';
+import 'package:procgen/types/types.dart';
 
 /// Warp a polyline by moving each point a random amount multiplied by c.
 List<Point> warpOpen({

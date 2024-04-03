@@ -1,7 +1,7 @@
-import 'package:tile_generator/algo/geometry/intersect.dart';
-import 'package:tile_generator/algo/types/segment.dart';
-import 'package:tile_generator/algo/types/types.dart';
-import 'package:tile_generator/algo/types/polygon.dart';
+import 'package:procgen/geometry/intersect.dart';
+import 'package:procgen/types/segment.dart';
+import 'package:procgen/types/types.dart';
+import 'package:procgen/types/polygon.dart';
 
 /// Returns the points that segment [l] intersects the polygon [poly].
 // TODO Maybe rename intersectPolygon.
