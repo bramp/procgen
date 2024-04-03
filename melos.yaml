@@ -1,0 +1,51 @@
+name: procgen_workspace
+
+packages:
+  - procgen
+  - procgen_showcase
+
+ide:
+  intellij:
+    enabled: false
+
+scripts:
+  test:
+    run: |
+      melos run test:dart --no-select && \
+      melos run test:flutter --no-select
+    description: Run tests all packages.
+
+  doc:
+    description: Run `dart doc` in all dart packages.
+    run: |
+      melos run doc:dart --no-select
+
+  doc:dart:
+    description: Run `dart doc` in all dart packages.
+    exec: dart doc
+    packageFilters:
+      dirExists: lib
+
+  test:dart:
+    description: Run `dart test` in all dart packages.
+    exec: dart test
+    packageFilters:
+      flutter: false
+      dirExists: test
+
+  test:flutter:
+    description: Run `flutter test` in all flutter packages.
+    exec: flutter test
+    packageFilters:
+      flutter: true
+      dirExists: test
+
+  upgrade:
+    run: |
+      melos exec -- "dart pub upgrade --major-versions"
+    description: Run `dart pub upgrade --major-versions` in all packages.
+
+  outdated:
+    run: |
+      melos exec -- "dart pub outdated"
+    description: Run `dart pub outdated` in all packages.
