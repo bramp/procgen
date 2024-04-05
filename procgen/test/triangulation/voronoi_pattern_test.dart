@@ -31,7 +31,12 @@ void main() {
   for (int i = 0; i < 100; i++) {
     group('VoronoiPattern.poisson(Random($i))', () {
       final rng = Random(i);
-      final voronoi = VoronoiPattern.poisson(rng, 96, 96, 12);
+      final voronoi = VoronoiPattern.poisson(
+        rng: rng,
+        width: 96,
+        height: 96,
+        distance: 12,
+      );
 
       test('valid output', () {
         expect(voronoi.pattern, isNotEmpty);

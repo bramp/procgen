@@ -5,47 +5,36 @@ import 'package:procgen/procgen.dart';
 import 'package:procgen_showcase/canvas.dart';
 
 class VoronoiPatternWidget extends StatelessWidget {
-  final int seed;
-
   final double width;
   final double height;
-  final double distance;
 
   final List<Point> points;
   final List<Polygon> polygons;
 
   const VoronoiPatternWidget._({
     super.key,
-    required this.seed,
     required this.width,
     required this.height,
-    required this.distance,
     required this.points,
     required this.polygons,
   });
 
   factory VoronoiPatternWidget({
     Key? key,
-    int seed = 1,
-    double width = 500,
-    double height = 500,
-    double distance = 25,
-  }) {
-    final voronoi = VoronoiPattern.poisson(
-      Random(seed),
-      width,
-      height,
-      distance,
-    );
 
+    // Input
+    required VoronoiPattern voronoi,
+
+    // output
+    bool drawPoints = true,
+    bool drawPolygons = true,
+  }) {
     return VoronoiPatternWidget._(
       key: key,
-      seed: seed,
-      width: width,
-      height: height,
-      distance: distance,
-      points: voronoi.pattern.keys.toList(),
-      polygons: voronoi.pattern.values.toList(),
+      width: voronoi.width,
+      height: voronoi.height,
+      points: drawPoints ? voronoi.pattern.keys.toList() : [],
+      polygons: drawPolygons ? voronoi.pattern.values.toList() : [],
     );
   }
 

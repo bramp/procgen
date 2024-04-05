@@ -53,9 +53,12 @@ class VoronoiPattern {
 
   /// Generate a Voronoi pattern using a list of seeds.
   factory VoronoiPattern(
-    final List<Point> seeds, // TODO Consider changing to a set.
-    final double
-        width, // TODO Consider not requiring width/height, and infer it from seeds.
+    /// The seed points that allow the pattern to be generated.
+    // TODO Consider changing to a set.
+    final List<Point> seeds,
+
+    // TODO Consider not requiring width/height, and infer it from seeds.
+    final double width,
     final double height,
   ) {
     final int n = seeds.length;
@@ -194,12 +197,18 @@ class VoronoiPattern {
   }
 
   /// Generate a Voronoi pattern using a [PoissonPattern] as seeds.
-  factory VoronoiPattern.poisson(
-    Random rng,
-    double width,
-    double height,
-    double distance,
-  ) {
+  factory VoronoiPattern.poisson({
+    required Random rng,
+
+    /// {@template PoissonPattern.width}
+    required double width,
+
+    /// {@template PoissonPattern.height}
+    required double height,
+
+    /// {@template PoissonPattern.distance}
+    required double distance,
+  }) {
     final seeds = PoissonPattern(
       rng: rng,
       width: width.toDouble(),

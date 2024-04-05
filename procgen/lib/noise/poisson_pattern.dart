@@ -4,7 +4,7 @@ import 'package:procgen/types/polar.dart';
 import 'package:procgen/types/types.dart';
 
 /// Generates random tightly-packed points such that they maintain a
-/// minimum user-specified distance, by using the Poisson
+/// minimum user-specified distance, by using the Bridson’s Poisson
 /// disk sampling algorithm.
 ///
 /// Example:
@@ -29,36 +29,46 @@ class PoissonPattern {
 
   final points = <Point>[];
 
-  final List<Point?> _grid;
-  final _queue = <Point>[];
-
   final double width;
   final double height;
 
   final double distance;
-  final double cellSize;
-  final int gridWidth;
-  final int gridHeight;
+
+  final double _cellSize;
+  final int _gridWidth;
+  final int _gridHeight;
+
+  final List<Point?> _grid;
+  final _queue = <Point>[];
 
   PoissonPattern._({
     required this.width,
     required this.height,
     required this.distance,
-    required this.cellSize,
-    required this.gridWidth,
-    required this.gridHeight,
-  }) : _grid = List.filled(gridWidth * gridHeight, null);
+    required double cellSize,
+    required int gridWidth,
+    required int gridHeight,
+  })  : _gridHeight = gridHeight,
+        _gridWidth = gridWidth,
+        _cellSize = cellSize,
+        _grid = List.filled(gridWidth * gridHeight, null);
 
   factory PoissonPattern({
     required Random rng,
 
+    /// {@template PoissonPattern.width}
     /// The width of the pattern.
+    /// {@endtemplate}
     required double width,
 
+    /// {@template PoissonPattern.height}
     /// The height of the pattern.
+    /// {@endtemplate}
     required double height,
 
+    /// {@template PoissonPattern.distance}
     /// The minimum distance between points.
+    /// {@endtemplate}
     required double distance,
 
     /// The unevenness of the pattern. A value of 0 will ensure all points are
@@ -98,7 +108,7 @@ class PoissonPattern {
     points.add(p);
     _queue.add(p);
 
-    _grid[(p.y ~/ cellSize) * gridWidth + (p.x ~/ cellSize)] = p;
+    _grid[(p.y ~/ _cellSize) * _gridWidth + (p.x ~/ _cellSize)] = p;
   }
 
   /// Step adding up to k more points from a random point in the queue.
@@ -155,16 +165,16 @@ class PoissonPattern {
 
   /// Returns true iff there are no points within `distance` of `p`.
   bool validate(final Point p) {
-    final px = p.x ~/ cellSize;
-    final py = p.y ~/ cellSize;
+    final px = p.x ~/ _cellSize;
+    final py = p.y ~/ _cellSize;
     const n = 2;
 
     // Range +/- [n] cells around p. This can wrap around to the other edge.
     for (int y = py - n; y <= py + n; y++) {
       // Calculate offset to row y
-      final row = (y % gridHeight) * gridWidth;
+      final row = (y % _gridHeight) * _gridWidth;
       for (int x = px - n; x <= px + n; x++) {
-        final g = _grid[row + (x % gridWidth)];
+        final g = _grid[row + (x % _gridWidth)];
         if (g != null) {
           // Slightly more invovled distance calculation so that we can wrap
           // around the edges.

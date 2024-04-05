@@ -1,28 +1,20 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:procgen/procgen.dart';
 
 class PoissonPatternWidget extends StatefulWidget {
   final int seed;
+  final PoissonPattern pattern;
 
-  final double width;
-  final double height;
-  final double distance;
+  final bool animate;
+  final bool drawRadius;
 
-  final List<Point> points;
-
-  PoissonPatternWidget({
+  const PoissonPatternWidget({
     super.key,
-    this.width = 500,
-    this.height = 500,
-    this.distance = 25,
-    this.seed = 1,
-  }) : points = PoissonPattern(
-          rng: Random(seed),
-          width: width,
-          height: height,
-          distance: distance,
-        ).points;
+    required this.pattern,
+    required this.seed,
+    this.animate = true,
+    this.drawRadius = true,
+  });
 
   @override
   State<PoissonPatternWidget> createState() => _PoissonPatternWidgetState();
@@ -61,15 +53,18 @@ class _PoissonPatternWidgetState extends State<PoissonPatternWidget>
     return AnimatedBuilder(
       animation: _controller,
       child: SizedBox(
-        width: widget.width,
-        height: widget.height,
+        width: widget.pattern.width,
+        height: widget.pattern.height,
       ),
       builder: (BuildContext context, Widget? child) {
         return CustomPaint(
           painter: PoissonPatternPainter(
-              points: widget.points,
-              limit: (_controller.value * widget.points.length).toInt(),
-              distance: widget.distance),
+            points: widget.pattern.points,
+            limit: ((widget.animate ? _controller.value : 1) *
+                    widget.pattern.points.length)
+                .toInt(),
+            distance: widget.drawRadius ? widget.pattern.distance : 0,
+          ),
           child: child,
         );
       },
@@ -83,6 +78,8 @@ class PoissonPatternPainter extends CustomPainter {
   /// Number of points to draw (for the animation)
   final int limit;
 
+  /// Radius to draw around each point. If less than or equal to zero then no
+  /// radius is drawn.
   final double distance;
 
   PoissonPatternPainter(
