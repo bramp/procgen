@@ -35,8 +35,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
 
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # TODO Do I need to install/bootstrap, just to run format?
+      #      For the moment it seems I do, but I haven't debugged why.
       - name: Install melos
         run: dart pub global activate melos
 
