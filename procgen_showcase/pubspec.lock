@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "1.0.6"
   delaunay:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: delaunay
       sha256: "15e8e8d7e7d13e7f0c1b970e91a07f9f500215919c36ef2d80d47a45bc61dd2f"

@@ -10,15 +10,19 @@ export 'types/polar.dart';
 export 'types/types.dart';
 export 'types/bounds.dart';
 export 'types/polyline.dart';
+
 export 'list.dart';
 export 'dcel.dart';
 
 export 'noise/warp.dart';
 export 'noise/perlin.dart';
 export 'noise/noise.dart';
+export 'noise/layered_noise.dart';
 export 'noise/poisson_pattern.dart';
+
 export 'random.dart';
 
+export 'triangulation/delaunay.dart';
 export 'triangulation/voronoi.dart';
 export 'triangulation/voronoi_pattern.dart';
 

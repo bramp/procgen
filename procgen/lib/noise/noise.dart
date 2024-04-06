@@ -1,20 +1,15 @@
-import 'dart:math';
+/// 2D noise interface.
+abstract class Noise {
+  /// Returns the noise value at the given coordinates, in the range [[min], [max]].
+  double get(double x, double y);
 
-import 'perlin.dart';
+  /// The min noise value.
+  double get min => -1.0;
 
-class Noise {
-  final List<Perlin> components;
+  /// The max noise value.
+  double get max => 1.0;
 
-  Noise._({this.components = const []});
-
-  double get(double x, double y) {
-    var result = 0.0;
-    for (int i = 0; i < components.length; i++) {
-      result += components[i].get(x, y);
-    }
-    return result;
-  }
-
+  /// Returns a 2D map of noise values.
   List<List<double>> getMap(int w, int h, [double sx = 1.0, double sy = 1.0]) {
     final map = <List<double>>[];
     for (int y = 0; y < h; y++) {
@@ -25,21 +20,5 @@ class Noise {
       map.add(row);
     }
     return map;
-  }
-
-  factory Noise.fractal({
-    required Random rng,
-    int octaves = 1,
-    int grid = 1,
-    double persistence = 0.5,
-  }) {
-    var amplitude = 1.0;
-    final components = <Perlin>[];
-    for (int i = 0; i < octaves; i++) {
-      components.add(Perlin(rng: rng, gridSize: grid, amplitude: amplitude));
-      grid *= 2;
-      amplitude *= persistence;
-    }
-    return Noise._(components: components);
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:delaunay/delaunay.dart';
 import 'package:flutter/material.dart';
 import 'package:procgen/procgen.dart';
 import 'package:procgen_showcase/canvas.dart';
@@ -7,6 +8,8 @@ import 'package:procgen_showcase/canvas.dart';
 class VoronoiPatternWidget extends StatelessWidget {
   final double width;
   final double height;
+
+  final List<Polygon> triangles;
 
   final List<Point> points;
   final List<Polygon> polygons;
@@ -17,9 +20,40 @@ class VoronoiPatternWidget extends StatelessWidget {
     required this.height,
     required this.points,
     required this.polygons,
+    this.triangles = const [],
   });
 
-  factory VoronoiPatternWidget({
+  factory VoronoiPatternWidget.fromMap({
+    Key? key,
+    Delaunay? delaunay,
+    required Map<Point, Polygon> voronoi,
+    required double width,
+    required double height,
+
+    // output
+    bool drawTriangles = true,
+    bool drawPoints = true,
+    bool drawPolygons = true,
+  }) {
+    // If there aren't enough points yet for a voronoi triangulation, use the
+    // supplied points.
+    final points = delaunay != null && delaunay.coords.length < (2 * 3)
+        ? delaunay.points()
+        : voronoi.keys.toList();
+
+    return VoronoiPatternWidget._(
+      key: key,
+      width: width,
+      height: height,
+      triangles: (drawTriangles && delaunay != null)
+          ? delaunay.polygonTriangles()
+          : [],
+      points: drawPoints ? points : [],
+      polygons: drawPolygons ? voronoi.values.toList() : [],
+    );
+  }
+
+  factory VoronoiPatternWidget.fromPattern({
     Key? key,
 
     // Input
@@ -44,6 +78,7 @@ class VoronoiPatternWidget extends StatelessWidget {
       painter: VoronoiPatternPainter(
         points: points,
         polygons: polygons,
+        triangles: triangles,
       ),
       child: SizedBox(
         width: width,
@@ -56,10 +91,12 @@ class VoronoiPatternWidget extends StatelessWidget {
 class VoronoiPatternPainter extends CustomPainter {
   final List<Polygon> polygons;
   final List<Point> points;
+  final List<Polygon> triangles;
 
   VoronoiPatternPainter({
     this.polygons = const [],
     this.points = const [],
+    this.triangles = const [],
   });
 
   @override
@@ -84,6 +121,17 @@ class VoronoiPatternPainter extends CustomPainter {
     for (final poly in polygons) {
       canvas.drawPolygon(
         poly,
+        Paint()
+          ..color = Colors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+    }
+
+    // Then triangles
+    for (final t in triangles) {
+      canvas.drawPolygon(
+        t,
         Paint()
           ..color = Colors.black
           ..style = PaintingStyle.stroke

@@ -2,9 +2,16 @@ import 'package:delaunay/delaunay.dart';
 
 import '../procgen.dart';
 
-extension DelaunayExt on Delaunay {
+extension DelaunayVoronoiExt on Delaunay {
   /// Returns centers and surrounding polygon for each voronoi cell.
+  // TODO I think this algorithm needs some work, as it does not do well
+  // when the points do not bound the area.
   Map<Point, Polygon> voronoi() {
+    if (triangles.isEmpty) {
+      // Call update to ensure the Delaunay triangles are generated.
+      update();
+    }
+
     final results = <Point, Polygon>{};
     final centers = List<Point?>.filled(triangles.length ~/ 3, null);
     final seen = List<bool>.filled(coords.length ~/ 2, false);

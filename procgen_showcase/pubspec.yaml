@@ -46,6 +46,7 @@ dependencies:
         path: packages/storybook_flutter
         ref: 7fd848bbc72437c844075b5297c62432266b521b
   provider: ^6.1.2
+  delaunay: ^2.0.0
 
 dev_dependencies:
   flutter_test:

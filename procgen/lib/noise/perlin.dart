@@ -3,19 +3,35 @@
 // * https://rtouti.github.io/graphics/perlin-noise-algorithm
 import 'dart:math';
 
-class Perlin {
-  final List<int> p;
-  final int gridSize;
+import 'package:procgen/noise/noise.dart';
+
+class Perlin extends Noise {
+  /// The permutation table used for the noise.
+  final List<int> permutation;
+
+  /// The noise is scaled by this amount.
   final double amplitude;
 
-  final offsetY = 0.0; // TODO This might be a int
-  final offsetX = 0.0;
+  /// All coordinates are scaled by this value.
+  /// TODO Split this into width/height
+  /// TODO Maybe rename to scale.
+  final double gridSize;
 
-  Perlin._({required this.p, this.gridSize = 1, this.amplitude = 1.0});
+  /// All coordinates are offset by this value.
+  final double offsetY;
+  final double offsetX;
+
+  Perlin._({
+    required this.permutation,
+    this.amplitude = 1.0,
+    this.gridSize = 1.0,
+    this.offsetX = 0.0,
+    this.offsetY = 0.0,
+  });
 
   /// Hash lookup table as defined by Ken Perlin.
   /// A random shuffle of the numbers 0-255.
-  static const permutation = <int>[
+  static const classic = <int>[
     151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, //
     140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148,
     247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32,
@@ -35,18 +51,21 @@ class Perlin {
   ];
 
   // TODO We don't need to precompute this
-  static const smoothSize = 4096;
-  static final smooth = List.generate(smoothSize, (i) => fade(i / smoothSize));
+  static const _smoothSize = 4096;
+  static final _smooth =
+      List.generate(_smoothSize, (i) => _fade(i / _smoothSize));
 
-  // Fade function as defined by Ken Perlin. This eases coordinate values
-  // so that they will ease towards integral values.  This ends up smoothing
-  // the final output.
-  // Defined as 6t^5 - 15t^4 + 10t^3
-  static double fade(double t) {
+  /// Fade function as defined by Ken Perlin. This eases coordinate values
+  /// so that they will ease towards integral values.  This ends up smoothing
+  /// the final output.
+  ///
+  /// Defined as 6t^5 - 15t^4 + 10t^3
+  static double _fade(double t) {
     return t * t * t * (t * (6.0 * t - 15.0) + 10.0);
   }
 
-  static double grad(double x, double y, int v) {
+  /// Returns the gradient value for the given coordinates.
+  static double _grad(double x, double y, int v) {
     return switch (v % 4) {
       0 => x + y,
       1 => x - y,
@@ -58,61 +77,85 @@ class Perlin {
 
   factory Perlin({
     required Random rng,
-    int gridSize = 1,
     double amplitude = 1.0,
+    double gridSize = 1.0,
+    double offsetX = 0.0,
+    double offsetY = 0.0,
   }) {
-    // TODO Maybe just generate the permutation on the fly.
-    final s = rng.nextInt(permutation.length);
+    // TODO Shuffle the permutation on the fly.
+    // Start at a random value, so we have different noise patterns.
+    final s = rng.nextInt(classic.length);
 
     var p = <int>[];
     for (int i = 0; i < 256; i++) {
-      p.add(permutation[(i + s) % permutation.length]);
+      p.add(classic[(i + s) % classic.length]);
     }
 
     // Double the length of p to avoid overview
     p = [...p, ...p];
 
     return Perlin._(
-      p: p,
-      gridSize: gridSize,
+      permutation: p,
       amplitude: amplitude,
+      gridSize: gridSize,
+      offsetX: offsetX,
+      offsetY: offsetY,
     );
   }
 
+  /// Get the noise value at the given coordinates.
+  ///
+  /// The returned noise value is between [-1, 1] * amplitude.
+  ///
+  /// The values x,y are in the range [0,1], but values outside of this range
+  /// will repeat.
+  @override
   double get(double x, double y) {
-    double dx = x * gridSize + offsetX;
-    if (dx < 0) {
-      dx += 256;
-    }
+    double dx = (x * gridSize + offsetX) % classic.length;
+    double dy = (y * gridSize + offsetY) % classic.length;
 
-    double dy = y * gridSize + offsetY;
-    if (dy < 0) {
-      dy += 256;
-    }
-
-    var x0 = dx.floor();
+    // Get the fractional parts of dx/dy.
+    final x0 = dx.truncate();
     final fx = dx - x0;
 
-    var y0 = dy.floor();
+    final y0 = dy.truncate();
     final fy = dy - y0;
 
     assert(fx >= 0.0 && fx <= 1.0);
     assert(fy >= 0.0 && fy <= 1.0);
 
     // TODO Decide if we just calculate, instead of precomputing this.
-    var wx = smooth[(fx * smooth.length).toInt()];
-    var wy = smooth[(fy * smooth.length).toInt()];
+    // Get the weights for the interpolation (which is the fractional part
+    // smoothed using the fade function).
+    final wx = _smooth[(fx * _smooth.length).toInt()];
+    final wy = _smooth[(fy * _smooth.length).toInt()];
 
-    final v0 = grad(fx - 0, fy - 0, p[p[x0 + 0] + y0 + 0]);
-    final v1 = grad(fx - 1, fy - 0, p[p[x0 + 1] + y0 + 0]);
-    final v2 = grad(fx - 0, fy - 1, p[p[x0 + 0] + y0 + 1]);
-    final v3 = grad(fx - 1, fy - 1, p[p[x0 + 1] + y0 + 1]);
+    // Get the gradients for the 4 corners of the cell.
+    final p = permutation;
+    final x0y0 = _grad(fx - 0, fy - 0, p[p[x0 + 0] + y0 + 0]);
+    final x1y0 = _grad(fx - 1, fy - 0, p[p[x0 + 1] + y0 + 0]);
+    final x0y1 = _grad(fx - 0, fy - 1, p[p[x0 + 0] + y0 + 1]);
+    final x1y1 = _grad(fx - 1, fy - 1, p[p[x0 + 1] + y0 + 1]);
 
-    // Lerp along x
-    final val0 = v0 + (v1 - v0) * wx;
-    final val1 = v2 + (v3 - v2) * wx;
+    // Lerp along x (along the top, then along the bottom)
+    final top = _lerpDouble(x0y0, x1y0, wx);
+    final bottom = _lerpDouble(x0y1, x1y1, wx);
 
-    // Lerp along y
-    return amplitude * (val0 + (val1 - val0) * wy);
+    // Lerp along y (between the top and bottom)
+    final result = amplitude * _lerpDouble(top, bottom, wy);
+
+    assert(result >= min && result <= max);
+
+    return result;
   }
+
+  @override
+  double get min => -amplitude;
+
+  @override
+  double get max => amplitude;
+}
+
+double _lerpDouble(double a, double b, double t) {
+  return a + (b - a) * t;
 }
