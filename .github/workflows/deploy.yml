@@ -2,8 +2,14 @@ name: Deploy Showcase to Github Pages
 
 on:
   # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  #push:
+  #  branches: ["main"]
+
+  # Only run if the other workflow is successful
+  workflow_run:
+    workflows: ["Build and Test"]
+    types:
+      - completed
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
