@@ -52,15 +52,15 @@ class VoronoiPattern {
         _outer = outer;
 
   /// Generate a Voronoi pattern using a list of seeds.
-  factory VoronoiPattern(
+  factory VoronoiPattern({
     /// The seed points that allow the pattern to be generated.
     // TODO Consider changing to a set.
-    final List<Point> seeds,
+    required final List<Point> seeds,
 
     // TODO Consider not requiring width/height, and infer it from seeds.
-    final double width,
-    final double height,
-  ) {
+    required final double width,
+    required final double height,
+  }) {
     final int n = seeds.length;
     final Set<Point> seeds32 = {};
     final Float32List extended = Float32List(n * 2 * 9);
@@ -211,12 +211,16 @@ class VoronoiPattern {
   }) {
     final seeds = PoissonPattern(
       rng: rng,
-      width: width.toDouble(),
-      height: height.toDouble(),
+      width: width,
+      height: height,
       distance: distance,
     ).points;
 
-    return VoronoiPattern(seeds, width, height);
+    return VoronoiPattern(
+      seeds: seeds,
+      width: width,
+      height: height,
+    );
   }
 
   /// Returns a repeated tiling of the voronoi diagram covering a area [w] by [h]

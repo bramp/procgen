@@ -18,7 +18,11 @@ extension DelaunayExt on Delaunay {
 
 void main() {
   test('VoronoiPattern(seeds).getRect()', () {
-    final pattern = VoronoiPattern(seeds, testWidth, testHeight);
+    final pattern = VoronoiPattern(
+      seeds: seeds,
+      width: testWidth,
+      height: testHeight,
+    );
 
     expect(pattern.pattern, isNotEmpty);
 
