@@ -1,5 +1,4 @@
-# Sample workflow for building and deploying a Hugo site to GitHub Pages
-name: Deploy Showcase to Pages
+name: Deploy Showcase to Github Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -57,7 +56,7 @@ jobs:
         run: |
           flutter build web \
             --release \
-            --base-href "${{ steps.pages.outputs.base_url }}/"
+            --base-href "${{ steps.pages.outputs.base_path }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
